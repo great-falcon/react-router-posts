@@ -1,45 +1,30 @@
 import React, { Component, Fragment } from "react";
-import { Link } from "react-router-dom";
+import { makeRequest } from '../requestFunction';
 
 class Post extends Component {
   state = {
     post: {},
     comments: []
   };
-  componentDidMount() {
-    console.log(this.props.match);
-    const postId = this.props.match.params.id || "";
+
+  async componentDidMount() {
+    const postId = this.props.match.params.postId || "";
+
+    const post = await makeRequest(`/posts/${postId}`);
+
+    const comments = await makeRequest(`/comments?postId=${postId}`);
     this.setState({
-      backButton: (
-        <button>
-          <Link to={this.props.location.state.from}>Back</Link>
-        </button>
-      )
+      post,
+      comments
     });
-    fetch(`https://jsonplaceholder.typicode.com/posts/${postId}`)
-      .then(res => res.json())
-      .then(data =>
-        this.setState({
-          post: data
-        })
-      );
-    fetch("https://jsonplaceholder.typicode.com/comments")
-      .then(response => response.json())
-      .then(data =>
-        this.setState({
-          comments: data.filter(
-            comment => comment.postId == this.props.match.params.id
-          )
-        })
-      );
+
+
   }
   render() {
-    const { post } = this.state;
-    const { comments } = this.state;
-    // const { title, body } = post;
+    const { post, comments } = this.state;
     return (
       <Fragment>
-        {this.state.backButton}
+        <button onClick={this.props.history.goBack}>Back</button>
         <h1>Post</h1>
         <h2>{post.title}</h2>
         <p>{post.body}</p>

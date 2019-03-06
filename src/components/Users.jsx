@@ -1,27 +1,25 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { makeRequest } from '../requestFunction';
 
 class Users extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      data: []
-    };
+  state = {
+    users: []
   }
 
-  componentDidMount() {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then(response => response.json())
-      .then(data => this.setState({ data }));
+  async componentDidMount() {
+    const users = await makeRequest('/users');
+    this.setState({ users });
   }
 
   render() {
-    const { data } = this.state;
+    const { users } = this.state;
     return (
       <div>
+        <button onClick={this.props.history.goBack}>Back</button>
         <h2>Users:</h2>
         <ul className="users">
-          {data.map(({ id, name }) => (
+          {users.map(({ id, name }) => (
             <li key={id}>
               <Link to={`/users/${id}/posts`}>{name}</Link>
             </li>
